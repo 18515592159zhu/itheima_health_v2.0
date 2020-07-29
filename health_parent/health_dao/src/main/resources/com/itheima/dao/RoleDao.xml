@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.RoleDao">
+    <select id="findByUid"  parameterType="Integer" resultType="Role">
+        SELECT * from t_role where id in (select role_id from t_user_role
+        where user_id = #{user_id})
+    </select>
+    <!--根据用户名查询角色ID-->
+    <select id = "findRidByUsername" parameterType="string" resultType="int">
+        select ur.role_id from t_user_role ur, t_user u where u.id= ur.user_id and u.username = #{value}
+    </select>
+
+    <!--**********************角色增删改查[开始]*********************************-->
+    <!--新增角色(1,新增组)-->
+    <insert id="add" parameterType="Role">
+        <selectKey keyProperty="id" resultType="java.lang.Integer" order="AFTER">
+            SELECT  LAST_INSERT_ID()
+        </selectKey>
+        insert into t_role(name,keyword,description)
+        values
+        (#{name},#{keyword},#{description})
+    </insert>
+
+    <!--新增角色(2, 更新中间表)-->
+    <insert parameterType="hashmap" id="setRoleAndPermission">
+        insert into t_role_permission(role_id, permission_id) values
+        (#{role_id}, #{permission_id})
+    </insert>
+    <!--新增角色(2, 更新中间表)-->
+    <insert parameterType="hashmap" id="setRoleAndMenu">
+        insert into t_role_menu (role_id, menu_id) values
+        (#{map.role_id}, #{map.menu_id})
+    </insert>
+    
+    <!--分页查询-->
+    <select id="selectByCondition" parameterType="string" resultType="Role">
+
+        select * from t_role
+        <if test="value !=null and value.length > 0 ">
+            where name like #{value} or keyword like #{value}
+        </if>
+    </select>
+
+
+    <!--编辑角色,当前角色内容回显-->
+    <select id="findById" parameterType="int" resultType="com.itheima.pojo.Role">
+  select * from t_role where id = #{id}
+    </select>
+    <!--编辑角色,权限项回显-->
+    <select id="findPermissionIdsByRoleId" parameterType="int" resultType="int">
+  select permission_id from t_role_permission where role_id = #{id}
+</select>
+    <!--编辑角色,菜单项回显-->
+    <select id="findMenuIdsByRoleId" parameterType="int" resultType="int">
+  select menu_id from t_role_menu where role_id = #{id}
+</select>
+    <!--根据角色id删除中间表数据（清理原有关联关系）-->
+    <delete id="deletePermissionAssociation" parameterType="int">
+  delete from t_role_permission where role_id = #{id}
+    </delete>
+    <!--根据角色id删除中间表数据（清理原有关联关系）-->
+    <delete id="deleteMenuAssociation" parameterType="int">
+  delete from t_role_menu where role_id = #{id}
+    </delete>
+    <!--编辑-->
+    <update id="edit" parameterType="com.itheima.pojo.Role">
+        update t_role
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="keyword != null">
+                keyword = #{keyword},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--根据ID删除角色-->
+    <delete id="delete" parameterType="int">
+        delete from t_role where id = #{id}
+    </delete>
+    <!--**********************角色增删改查[结束]*********************************-->
+    <!--新增用户, 查询所有角色-->
+    <select id="findAll" resultType="Role">
+        select * from t_role
+    </select>
+
+    <!--根据角色id,查询关联的菜单id-->
+    <select id="findMidByRid" resultType="int" parameterType="int">
+        select menu_id from t_role_menu where role_id = #{id}
+    </select>
+</mapper>

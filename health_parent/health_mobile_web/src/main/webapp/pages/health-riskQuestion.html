@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,user-scalable=no,minimal-ui">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../img/asset-favico.ico">
+    <title>评估问卷</title>
+    <link rel="stylesheet" href="../css/page-health-riskQuestion.css"/>
+    <link rel="stylesheet" href="../plugins/elementui/index.css">
+    <script src="../plugins/jquery/dist/jquery.js"></script>
+    <script src="../plugins/vue/vue.js"></script>
+    <script src="../plugins/vue/axios-0.18.0.js"></script>
+    <script src="../plugins/elementui/index.js"></script>
+    <script src="../plugins/healthmobile.js"></script>
+    <script>
+        var id = getUrlParam(id);
+    </script>
+</head>
+
+<body data-spy="scroll" data-target="#myNavbar" data-offset="150">
+<div class="app" id="app">
+    <!-- 页面头部 -->
+    <div class="top-header">
+        <span class="f-left"><i class="icon-back"></i>返回</span>
+        <span class="center">传智健康</span>
+        <span class="f-right"><i class="icon-more"></i></span>
+    </div>
+    <!-- 页面内容 -->
+    <div class="contentBox">
+        <div class="question" id="question_area">
+            <div class="q-tit">
+                <p class="tit">感谢您参与传智健康,中医体质辨识问卷</p>
+            </div>
+            <div class="q-choose">
+                <div class="table-content">
+                    <ul class="table-list">
+                        <li class="table-item" v-for="c in questions">
+                            <el-card class="box-card" shadow="hover">
+                                <div class="text item">{{c.name}}</div>
+                                <br/>
+                                <template>
+                                    <el-radio-group v-model="c.value">
+                                        <el-radio :label="1">A.没有(根本不)</el-radio>
+                                        <el-radio :label="2">B.很少(有一点)</el-radio>
+                                        <el-radio :label="3">C.有时(有些)</el-radio>
+                                        <el-radio :label="4">D.经常</el-radio>
+                                        <el-radio :label="5">E.总是</el-radio>
+                                    </el-radio-group>
+                                </template>
+                                <br/>
+                            </el-card>
+                            <br/>
+                        </li>
+                    </ul>
+                </div>
+                <el-card class="box-card" shadow="hover">
+                    <div class="text item">请输入您的姓名</div>
+                    <br/>
+                    <template>
+                        <el-input v-model="name" placeholder="请输入您的姓名"></el-input>
+                    </template>
+                    <br/>
+                </el-card>
+                <el-card class="box-card" shadow="hover">
+                    <div class="text item">请输入您的手机号</div>
+                    <br/>
+                    <template>
+                        <el-input v-model="phoneNumber" placeholder="请输入您的手机号"></el-input>
+                    </template>
+                    <br/>
+                </el-card>
+                <div class="tool-btn">
+                    <a class="btn next-btn" href="#" @click.prevent="submit()">提交</a>
+                    <a class="btn cancle-btn">取消</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页面 css js -->
+<!-- <script src="health-index.js"></script> -->
+
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            radio: 3,
+            questions: [],
+            name:'',
+            phoneNumber:''
+        },
+        methods: {
+            handleNext() {
+            },
+            getQuestion() {
+                id =1;
+                axios.get('/questionnaire/findById.do?id='+id).then(res => {
+                    if(res.data.flag){
+                        this.questions = res.data.data.questions;
+                    }
+                })
+            },
+            submit(){
+                axios.post('/questionnaire/submit.do?name='+this.name+'&phoneNumber='+this.phoneNumber,this.questions).then(res => {
+                    if(res.data.flag){
+                        window.location.href = "question_results.html?id=" + res.data.data.id+'&name='+this.name;
+                    }
+                })
+            }
+        },
+        created(){
+            this.getQuestion();
+        }
+    });
+</script>
+</html>

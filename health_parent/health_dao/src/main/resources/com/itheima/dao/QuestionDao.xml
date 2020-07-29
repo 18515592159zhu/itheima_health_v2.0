@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.QuestionDao">
+
+    <select id="selectByCondition" parameterType="String" resultType="Question">
+        SELECT * FROM t_question
+        <if test="value != null and value.length > 0 ">
+            WHERE name = #{value}
+        </if>
+    </select>
+
+    <select id="findByQuestionnaireId" parameterType="int" resultType="Question">
+        select * from t_question where id in (select question_id from t_question_questionnaire where questionnaire_id = #{id})
+    </select>
+
+</mapper>

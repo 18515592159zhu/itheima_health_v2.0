@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.QuestionnaireDao">
+
+    <select id="selectByCondition" parameterType="String" resultType="Questionnaire">
+        SELECT * FROM t_questionnaire
+        <if test="value != null and value.length > 0 ">
+            WHERE name = #{value}
+        </if>
+    </select>
+
+    <select id="findById" parameterType="int" resultMap="findQuestionById">
+        SELECT * FROM t_questionnaire where id = #{id}
+    </select>
+
+    <resultMap id="findQuestionById" type="Questionnaire">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="enable" property="enable"/>
+        <result column="sex" property="sex"/>
+        <collection column="id" property="questions" ofType="Question"
+                    select="com.itheima.dao.QuestionDao.findByQuestionnaireId"/>
+    </resultMap>
+
+    <insert id="generateResults" parameterType="QuestionnaireResult" keyProperty="id" useGeneratedKeys="true">
+        insert into t_questionnaireresult values
+        (null,#{fileCode},#{date},#{pinghe},#{qixu},#{yangxu},#{yinxu},#{tanshi},#{shire},#{xueyu},#{qiyu},#{tebing},#{member_id})
+    </insert>
+</mapper>

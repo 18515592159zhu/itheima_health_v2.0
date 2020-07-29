@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.QuestionnaireResultDao">
+
+    <select id="selectByCondition" parameterType="String" resultType="QuestionnaireResult">
+        SELECT * FROM t_questionnaireresult
+        <if test="value != null and value.length > 0 ">
+            WHERE name = #{value}
+        </if>
+    </select>
+
+    <select id="findById" parameterType="int" resultType="map">
+        SELECT qr.*,m.name FROM t_questionnaireresult qr, t_member m where qr.member_id = m.id and qr.id = #{id}
+    </select>
+
+
+</mapper>

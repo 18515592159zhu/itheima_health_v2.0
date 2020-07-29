@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.MenuDao">
+
+    <!--查找所有一级菜单-->
+    <select id="findMenuInfo" resultType="Menu" parameterType="int">
+        select * from t_menu m where m.level = 1 and  m.id = #{id}
+    </select>
+
+    <!--查询2级菜单-->
+    <select id="findSecondMenuInfo" parameterType="int" resultType="Menu">
+        select * from t_menu where level = 2 and parentMenuId = #{value}
+    </select>
+    
+    
+    <!--*********************菜单管理增删改查[开始]**********************************-->
+    <!--新增-->
+    <insert  id="add" parameterType="Menu">
+        insert into t_menu(name,linkUrl,path,priority,description,parentMenuId)
+         values(#{name},#{linkUrl},#{path},#{priority},#{description},#{parentMenuId})
+    </insert>
+
+
+    <!--分页查询-->
+    <select id="selectByCondition" parameterType="String" resultType="Menu">
+        SELECT * FROM t_menu
+        <if test="value != null and value.length > 0 ">
+            WHERE name like #{value}
+        </if>
+    </select>
+
+    <!--删除-->
+    <delete id="deleteById" parameterType="int">
+        delete from t_menu where id = #{id}
+    </delete>
+    <!--根据菜单项ID查询中间表关系-->
+    <select id="findCountByMenuId" parameterType="int" resultType="long">
+        select count(*) from t_role_menu where menu_id = #{menu_id}
+    </select>
+
+
+    <!--回显数据,根据ID查询-->
+    <select id="findById" parameterType="int" resultType="Menu">
+        select * from t_menu
+        <if test="value != 0">
+            where id = #{value}
+        </if>
+    </select>
+
+    <!--修改数据-->
+    <update id="update" parameterType="Menu">
+        update t_menu
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="linkUrl != null">
+                linkUrl = #{linkUrl},
+            </if>
+            <if test="path != null">
+                path = #{path},
+            </if>
+            <if test="priority != null">
+                priority = #{priority},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="parentMenuId != null">
+                parentMenuId = #{parentMenuId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+
+    <!--*********************菜单管理增删改查[结束]**********************************-->
+
+    <!--角色组中动态查询所有检查项-->
+    <select id="findAll" resultType="Menu">
+        select * from t_menu
+    </select>
+    <!--根据中间表查询菜单项-->
+    <select id="findMenuById" resultType="Menu">
+        select * from t_menu where id
+        in (select menu_id from t_role_menu where role_id = #{id})
+    </select>
+</mapper>

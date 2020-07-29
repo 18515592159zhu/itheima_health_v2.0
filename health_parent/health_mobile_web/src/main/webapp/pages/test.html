@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../plugins/jquery/dist/jquery.js"></script>
+    <script src="../plugins/vue/vue.js"></script>
+    <script src="../plugins/vue/axios-0.18.0.js"></script>
+    <script src="../plugins/elementui/index.js"></script>
+    <link rel="stylesheet" href="../plugins/elementui/index.css">
+    <style>
+        .text {
+            font-size: 14px;
+        }
+
+        .item {
+            padding: 18px 0;
+        }
+
+        .box-card {
+            width: 480px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app">
+    <div class="table-content">
+        <ul class="table-list">
+            <li class="table-item" v-for="c in questions">
+                <el-card class="box-card" shadow="hover">
+                    <div class="text item">{{c.name}}</div>
+                    <template>
+                        <el-radio-group v-model="c.value">
+                            <el-radio :label="3">备选项</el-radio>
+                            <el-radio :label="6">备选项</el-radio>
+                            <el-radio :label="9">备选项</el-radio>
+                        </el-radio-group>
+                    </template>
+                    <br/>
+                </el-card>
+                <br/>
+            </li>
+        </ul>
+    </div>
+    <button type="button" @click="submit">提交</button>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            questions: [
+                {
+                    "name": "第一个题目",
+                    "title": "工作台",
+                    "icon": "fa-dashboard",
+                    "children": [],
+                    'value': '0'
+                },
+                {
+                    "name": "第二个题目",
+                    "title": "工作台",
+                    "icon": "fa-dashboard",
+                    "children": [],
+                    'value': '0'
+                },
+                {
+                    "name": "第三个题目",
+                    "title": "工作台",
+                    "icon": "fa-dashboard",
+                    "children": [],
+                    'value': '0'
+                }
+            ]
+        },
+        methods: {
+            submit() {
+                axios.post('/question/submit.do', this.questions).then(res => {
+
+                })
+            }
+        }
+
+    })
+</script>
+
+</body>
+</html>

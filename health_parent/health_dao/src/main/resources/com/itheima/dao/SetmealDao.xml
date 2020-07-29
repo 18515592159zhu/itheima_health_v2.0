@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.SetmealDao" >
+    <!--新增-->
+    <insert id="add" parameterType="com.itheima.pojo.Setmeal">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_setmeal
+        (code,name,sex,age,helpCode,price,remark,attention,img)
+        values
+        (#{code},#{name},#{sex},#{age},#{helpCode},#{price},#{remark},#{attention},#{img})
+    </insert>
+
+    <!--绑定套餐和检查组多对多关系-->
+    <insert id="setSetmealAndCheckGroup" parameterType="hashmap">
+        insert into t_setmeal_checkgroup
+      		(setmeal_id,checkgroup_id)
+      			values
+      		(#{setmeal_id},#{checkgroup_id})
+    </insert>
+
+    <!--根据条件查询-->
+    <select id="selectByCondition" parameterType="string" resultType="com.itheima.pojo.Setmeal">
+        select * from t_setmeal
+        <if test="value != null and value.length > 0">
+            where code = #{value} or name = #{value} or helpCode = #{value}
+        </if>
+    </select>
+
+    <!--查询所有套餐-->
+    <select id="findAllMeal" resultType="Setmeal">
+        select * from t_setmeal
+    </select>
+
+    <!--根据ID删除套餐-->
+    <delete id="delete" parameterType="int">
+        delete from t_setmeal where id = #{id}
+    </delete>
+    <!--根据套餐id删除中间表数据（清理原有关联关系）-->
+    <delete id="deleteAssociation" parameterType="int">
+  delete from t_setmeal_checkgroup where setmeal_id = #{id}
+</delete>
+
+    <!--编辑检查组,当前检查组内容回显-->
+    <select id="findBySetmealId" parameterType="int" resultType="com.itheima.pojo.Setmeal">
+  select * from t_setmeal where id = #{id}
+    </select>
+    <!--编辑检查组,检查项回显-->
+    <select id="findCheckGroupIdsBySetmealId" parameterType="int" resultType="int">
+  select checkgroup_id from t_setmeal_checkgroup where setmeal_id = #{id}
+</select>
+    <!--编辑-->
+    <update id="edit" parameterType="com.itheima.pojo.Setmeal">
+        update t_setmeal
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+
+    <!--根据ID查询单个套餐详情-->
+    <select id="findById" parameterType="Integer" resultMap="findByIdResultMap">
+        select * from t_setmeal where id = #{id}
+    </select>
+    <resultMap id="findByIdResultMap" type="Setmeal" extends="baseResultMap">
+        <collection property="checkGroups" javaType="ArrayList" ofType="CheckGroup"
+          column="id" select="com.itheima.dao.CheckGroupDao.findCheckGroupById">
+        </collection>
+    </resultMap>
+    <resultMap id="baseResultMap" type="Setmeal">
+        <id column="id" property="id"/>
+        <id column="name" property="name"/>
+        <id column="helpCode" property="helpCode"/>
+        <id column="sex" property="sex"/>
+        <id column="age" property="age"/>
+        <id column="price" property="price"/>
+        <id column="remark" property="remark"/>
+        <id column="attention" property="attention"/>
+        <id column="img" property="img"/>
+    </resultMap>
+
+
+    <!--查询预约套餐总数,按套餐名分组-->
+    <select id="findSetmealCount" resultType="map">
+      select s.name, count(o.id) as value from t_setmeal s, t_order o
+      where s.id = o.setmeal_id group by s.name
+    </select>
+
+    <!---->
+    <select id="findSetmealByCheckGroupId" parameterType="Integer" resultType="Setmeal">
+        select * from t_setmeal where id in
+        (select setmeal_id from t_setmeal_checkgroup where  checkgroup_id = #{id})
+    </select>
+</mapper>

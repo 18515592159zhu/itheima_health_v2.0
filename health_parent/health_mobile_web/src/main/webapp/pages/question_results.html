@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,user-scalable=no,minimal-ui">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../img/asset-favico.ico">
+    <title>问卷结束</title>
+    <link rel="stylesheet" href="../css/page-health-riskQuestion.css"/>
+    <link rel="stylesheet" href="../plugins/elementui/index.css">
+    <script src="../plugins/jquery/dist/jquery.js"></script>
+    <script src="../plugins/vue/vue.js"></script>
+    <script src="../plugins/vue/axios-0.18.0.js"></script>
+    <script src="../plugins/elementui/index.js"></script>
+    <script src="../plugins/healthmobile.js"></script>
+    <script>
+        var id = getUrlParam(id);
+    </script>
+
+    <link rel="stylesheet" href="../css/page-health-riskPageComplete.css"/>
+</head>
+
+<body data-spy="scroll" data-target="#myNavbar" data-offset="150">
+<div class="app" id="app">
+    <!-- 页面头部 -->
+    <div class="top-header">
+        <span class="f-left"><i class="icon-back"></i>返回</span>
+        <span class="center">传智健康</span>
+        <span class="f-right"><i class="icon-more"></i></span>
+    </div>
+    <!-- 页面内容 -->
+    <div class="contentBox">
+        <div class="question" id="question_area">
+            <div class="q-tit">
+                <p class="tit">感谢您参与传智健康,中医体质辨识问卷</p>
+            </div>
+            <div class="q-choose">
+                <div class="table-content">
+                    <el-card class="box-card" shadow="hover">
+                        <div class="text item">评估参与人:{{result.name}}</div>
+                        <div class="text item">评估日期:{{result.date}}</div>
+                        <br/>
+                        <template>
+                            <div v-if="result.yangxu == 1" class="text item">评估结果:阳虚体质</div>
+                            <div v-if="result.qixu == 1" class="text item">评估结果:气虚体质</div>
+                            <div v-if="result.yinxu == 1" class="text item">评估结果:阴虚体质</div>
+                            <div v-if="result.tanshi == 1" class="text item">评估结果:痰湿体质</div>
+                            <div v-if="result.shire == 1" class="text item">评估结果:湿热体质</div>
+                            <div v-if="result.qiyu == 1" class="text item">评估结果:气郁体质</div>
+                            <div v-if="result.xueyu == 1" class="text item">评估结果:血瘀体质</div>
+                            <div v-if="result.tebing == 1" class="text item">评估结果:特禀体质</div>
+                            <div v-if="result.pinghe == 1" class="text item">评估结果:平和体质</div>
+                        </template>
+                        <br/>
+                    </el-card>
+                </div>
+                <div class="tool-btn">
+                    <a class="btn next-btn" href="#" @click.prevent="handle()">返回首页</a>
+                    <a class="btn cancle-btn">取消</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- 页面 css js -->
+<!-- <script src="health-index.js"></script> -->
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            radio: 3,
+            result: {}
+        },
+        methods: {
+            handle() {
+                window.location.href = "index.html"
+            },
+            getResult() {
+                id = 1;
+                axios.get('/questionnaireResult/findById.do?id=' + id).then(res => {
+                    if (res.data.flag) {
+                        this.result = res.data.data;
+                    }
+                })
+            },
+        },
+        created() {
+            this.getResult();
+        }
+    });
+</script>
+
+</body>

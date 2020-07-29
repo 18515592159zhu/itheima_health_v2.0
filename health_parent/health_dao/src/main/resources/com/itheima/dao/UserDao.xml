@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.UserDao">
+
+    <select id="findUserByUsername" parameterType="String" resultType="User">
+        SELECT * FROM t_user WHERE username = #{username}
+    </select>
+
+    <!--增删改查[开始]-->
+    <!--新增-->
+    <insert id="add" parameterType="com.itheima.pojo.User">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_user
+        (username,remark)
+        values
+        (#{username},#{remark})
+    </insert>
+    <!--绑定套餐和检查组多对多关系-->
+    <insert id="setUserAndRole" parameterType="hashmap">
+        insert into t_user_role
+      		(user_id,role_id)
+      			values
+      		(#{user_id},#{role_id})
+    </insert>
+
+    <!--根据条件分页查询-->
+    <select id="selectByCondition" parameterType="string" resultType="com.itheima.pojo.User">
+        select * from t_user
+        <if test="value != null and value.length > 0">
+            where username like #{value}
+        </if>
+    </select>
+
+    <!--查询所有套餐-->
+    <select id="findAllMeal" resultType="User">
+        select * from t_user
+    </select>
+
+    <!--根据ID删除套餐-->
+    <delete id="delete" parameterType="int">
+        delete from t_user where id = #{id}
+    </delete>
+    <!--根据套餐id删除中间表数据（清理原有关联关系）-->
+    <delete id="deleteAssociation" parameterType="int">
+  delete from t_user_role where user_id = #{id}
+</delete>
+
+    <!--编辑检查组,当前检查组内容回显-->
+    <select id="findById" parameterType="int" resultType="com.itheima.pojo.User">
+  select * from t_user where id = #{id}
+    </select>
+    <!--编辑检查组,检查项回显-->
+    <select id="findRoleIdsByUserId" parameterType="int" resultType="int">
+  select role_id from t_user_role where user_id = #{id}
+</select>
+    <!--编辑-->
+    <update id="edit" parameterType="com.itheima.pojo.User">
+        update t_user
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="remark != null">
+                remark = #{remark}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="chengedByUsername">
+        update t_user
+        <set>
+            <if test="password !=null">
+                password = #{password},
+            </if>
+        </set>
+        where username = #{username}
+    </update>
+    <!--增删改查[结束]-->
+
+</mapper>
